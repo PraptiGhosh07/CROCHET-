@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crochet App 🧶</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== CSS VARIABLES & THEME ===== */
+    :root {
+      --bg: #fdf6f0;
+      --bg2: #fef9f5;
+      --surface: rgba(255,255,255,0.72);
+      --surface2: rgba(255,248,240,0.85);
+      --border: rgba(210,170,140,0.25);
+      --shadow: rgba(180,120,80,0.10);
+      --shadow2: rgba(180,120,80,0.18);
+      --text: #3d2a1e;
+      --text2: #7a5c48;
+      --text3: #b08060;
+      --accent: #e07b5a;
+      --accent2: #c9a87c;
+      --accent3: #d4a0b5;
+      --accent4: #8db8a0;
+      --pink: #f2c4ce;
+      --sage: #b8d4c4;
+      --cream: #f5e6d3;
+      --lavender: #d4c8e8;
+      --yarn1: #e8a87c;
+      --yarn2: #d4849a;
+      --yarn3: #8abba6;
+      --yarn4: #a89cd4;
+      --radius: 20px;
+      --radius-sm: 12px;
+      --transition: 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="dark"] {
+      --bg: #1e1510;
+      --bg2: #251a12;
+      --surface: rgba(40,28,18,0.80);
+      --surface2: rgba(50,35,22,0.90);
+      --border: rgba(180,120,70,0.18);
+      --shadow: rgba(0,0,0,0.35);
+      --shadow2: rgba(0,0,0,0.50);
+      --text: #f5ede3;
+      --text2: #c8a882;
+      --text3: #907060;
+      --accent: #e8926e;
+      --accent2: #d4b88c;
+      --accent3: #e0aac0;
+      --accent4: #9ccbb0;
+      --pink: #5a303a;
+      --sage: #2e4a3a;
+      --cream: #3a2a1a;
+      --lavender: #342850;
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+    h1,h2,h3,h4 { font-family: 'Playfair Display', serif; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; font-family: 'Nunito', sans-serif; }
+    input, select, textarea { font-family: 'Nunito', sans-serif; }
+    img { max-width: 100%; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 8px; }
+
+    /* ===== GLASS UTILITY ===== */
+    .glass {
+      background: var(--surface);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px var(--shadow);
+    }
+    .glass2 {
+      background: var(--surface2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px var(--shadow);
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 70px;
+      background: var(--surface);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 20px var(--shadow);
+      transition: background var(--transition);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem; font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { font-size: 1.5rem; }
+    .nav-links {
+      display: flex; gap: 2rem; align-items: center;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.92rem; font-weight: 600;
+      color: var(--text2);
+      transition: color var(--transition);
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0;
+      width: 0; height: 2px; background: var(--accent);
+      border-radius: 2px; transition: width var(--transition);
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .theme-toggle {
+      width: 44px; height: 24px;
+      background: var(--cream);
+      border: 2px solid var(--border);
+      border-radius: 24px;
+      position: relative;
+      transition: background var(--transition);
+      cursor: pointer;
+    }
+    .theme-toggle::after {
+      content: ''; position: absolute;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--accent); top: 2px; left: 2px;
+      transition: transform var(--transition), background var(--transition);
+    }
+    [data-theme="dark"] .theme-toggle { background: var(--bg2); }
+    [data-theme="dark"] .theme-toggle::after { transform: translateX(20px); }
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--text2); border-radius: 2px;
+      transition: transform var(--transition), opacity var(--transition);
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed; top: 70px; left: 0; right: 0; z-index: 999;
+      background: var(--surface);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      flex-direction: column; gap: 1rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 1rem; font-weight: 600; color: var(--text2);
+      padding: 0.5rem 0; border-bottom: 1px solid var(--border);
+      transition: color var(--transition);
+    }
+    .mobile-menu a:hover { color: var(--accent); }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      padding: 100px 2rem 4rem;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: linear-gradient(135deg, var(--cream) 0%, var(--pink) 40%, var(--lavender) 70%, var(--sage) 100%);
+      opacity: 0.55;
+    }
+    /* Decorative yarn blobs */
+    .blob {
+      position: absolute; border-radius: 50%; opacity: 0.18; z-index: 0;
+      animation: blobFloat 8s ease-in-out infinite;
+      filter: blur(2px);
+    }
+    .blob1 { width: 320px; height: 320px; background: var(--yarn1); top: -80px; left: -80px; animation-delay: 0s; }
+    .blob2 { width: 220px; height: 220px; background: var(--yarn2); top: 60%; right: -60px; animation-delay: 2s; }
+    .blob3 { width: 180px; height: 180px; background: var(--yarn3); bottom: 10%; left: 15%; animation-delay: 4s; }
+    .blob4 { width: 140px; height: 140px; background: var(--yarn4); top: 30%; right: 20%; animation-delay: 1s; }
+    .yarn-deco {
+      position: absolute; z-index: 0; font-size: 3rem;
+      opacity: 0.13; user-select: none;
+      animation: yarnSpin 14s linear infinite;
+    }
+    .yarn-deco:nth-child(5)  { top: 15%; left: 5%;  font-size: 2.5rem; animation-delay: 0s; }
+    .yarn-deco:nth-child(6)  { top: 70%; right: 8%; font-size: 3.5rem; animation-delay: 3s; }
+    .yarn-deco:nth-child(7)  { bottom: 8%; left: 40%; font-size: 2rem; animation-delay: 6s; }
+    @keyframes blobFloat {
+      0%,100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.07); }
+    }
+    @keyframes yarnSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .hero-content {
+      position: relative; z-index: 1;
+      text-align: center; max-width: 760px;
+      animation: fadeUp 1s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(36px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-badge {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.4rem 1.2rem;
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--accent); letter-spacing: 0.08em;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 em { color: var(--accent); font-style: italic; }
+    .hero p {
+      font-size: 1.12rem; color: var(--text2); line-height: 1.75;
+      margin-bottom: 2.2rem; max-width: 540px; margin-left: auto; margin-right: auto;
+    }
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.78rem 1.8rem; border-radius: 100px;
+      font-size: 0.95rem; font-weight: 700;
+      transition: all var(--transition);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(224,123,90,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(224,123,90,0.45); }
+    .btn-outline {
+      background: var(--surface);
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .btn-outline:hover { background: var(--cream); transform: translateY(-2px); }
+    .hero-stats {
+      display: flex; gap: 2.5rem; justify-content: center;
+      margin-top: 3rem; flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700; color: var(--accent);
+      display: block;
+    }
+    .hero-stat .lbl { font-size: 0.8rem; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ===== SECTION WRAPPER ===== */
+    section { padding: 5rem 2rem; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-title {
+      text-align: center; margin-bottom: 3rem;
+    }
+    .section-title h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      color: var(--text); margin-bottom: 0.6rem;
+    }
+    .section-title p { color: var(--text2); font-size: 1.02rem; }
+    .pill {
+      display: inline-block;
+      background: var(--cream);
+      color: var(--accent);
+      border-radius: 100px;
+      padding: 0.25rem 1rem;
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    /* ===== PROJECTS SECTION ===== */
+    #projects { background: var(--bg2); }
+    .project-controls {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 2rem; align-items: center;
+    }
+    .search-wrap {
+      flex: 1; min-width: 200px;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%; padding: 0.75rem 1.2rem 0.75rem 3rem;
+      border-radius: 100px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap .search-icon {
+      position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+      color: var(--text3); pointer-events: none; font-size: 1.1rem;
+    }
+    .filter-select {
+      padding: 0.75rem 1.2rem; border-radius: 100px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.92rem;
+      outline: none; cursor: pointer;
+      transition: border-color var(--transition);
+    }
+    .filter-select:focus { border-color: var(--accent); }
+    .btn-add {
+      background: var(--accent); color: #fff;
+      padding: 0.75rem 1.5rem; border-radius: 100px;
+      font-size: 0.92rem; font-weight: 700;
+      display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 4px 14px rgba(224,123,90,0.3);
+      transition: all var(--transition);
+    }
+    .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(224,123,90,0.4); }
+
+    /* Project Cards Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .project-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .project-card.easy::before   { background: linear-gradient(90deg, var(--sage), var(--accent4)); }
+    .project-card.medium::before { background: linear-gradient(90deg, var(--accent2), var(--yarn1)); }
+    .project-card.hard::before   { background: linear-gradient(90deg, var(--accent3), var(--yarn2)); }
+    .project-card:hover { transform: translateY(-5px); box-shadow: 0 12px 35px var(--shadow2); }
+    .project-card.done { opacity: 0.7; }
+    .project-card.done .proj-name { text-decoration: line-through; color: var(--text3); }
+
+    .proj-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .proj-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 600; color: var(--text); flex: 1; padding-right: 0.5rem; }
+    .proj-badge {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      padding: 0.25rem 0.75rem; border-radius: 100px; white-space: nowrap;
+      letter-spacing: 0.06em;
+    }
+    .badge-easy   { background: var(--sage); color: #2d5040; }
+    .badge-medium { background: var(--cream); color: #7a5020; }
+    .badge-hard   { background: var(--pink); color: #7a3050; }
+    [data-theme="dark"] .badge-easy   { background: #2e4a3a; color: #8ecfb0; }
+    [data-theme="dark"] .badge-medium { background: #3a2a1a; color: #d4a87c; }
+    [data-theme="dark"] .badge-hard   { background: #5a303a; color: #e0a0b8; }
+
+    .proj-meta { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.2rem; }
+    .proj-meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text2); }
+    .proj-meta-item span:first-child { font-size: 1rem; }
+
+    .proj-actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+    .proj-btn {
+      padding: 0.45rem 1rem; border-radius: 100px;
+      font-size: 0.82rem; font-weight: 600;
+      transition: all var(--transition);
+    }
+    .btn-done {
+      background: var(--sage); color: #2d5040; flex: 1;
+      border: 1px solid rgba(100,180,130,0.3);
+    }
+    .btn-done:hover { background: var(--accent4); color: #fff; }
+    [data-theme="dark"] .btn-done { background: #2e4a3a; color: #8ecfb0; }
+    .btn-edit {
+      background: var(--cream); color: var(--text2);
+      border: 1px solid var(--border);
+    }
+    .btn-edit:hover { background: var(--lavender); color: var(--text); }
+    [data-theme="dark"] .btn-edit { background: #342850; color: var(--text2); }
+    .btn-del {
+      background: var(--pink); color: #7a3050;
+      border: 1px solid rgba(200,100,130,0.2);
+    }
+    .btn-del:hover { background: #e07090; color: #fff; }
+    [data-theme="dark"] .btn-del { background: #5a303a; color: #e0a0b8; }
+
+    .empty-state {
+      text-align: center; padding: 3rem; color: var(--text3);
+      grid-column: 1/-1;
+    }
+    .empty-state .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .empty-state p { font-size: 1.05rem; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(30,15,5,0.55);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--transition);
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.2rem;
+      width: 100%; max-width: 520px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+      transform: translateY(30px) scale(0.97);
+      transition: transform var(--transition);
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem;
+    }
+    .modal-header h3 { font-size: 1.4rem; color: var(--text); }
+    .modal-close {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--cream); color: var(--text2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; transition: all var(--transition);
+    }
+    .modal-close:hover { background: var(--pink); color: var(--accent); }
+    [data-theme="dark"] .modal-close { background: var(--bg2); }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label {
+      display: block; margin-bottom: 0.4rem;
+      font-size: 0.88rem; font-weight: 700; color: var(--text2);
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 0.78rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      font-size: 0.93rem;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .modal-footer { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1.5rem; }
+    .btn-cancel {
+      padding: 0.72rem 1.5rem; border-radius: 100px;
+      background: var(--cream); color: var(--text2);
+      font-size: 0.92rem; font-weight: 600;
+      border: 1.5px solid var(--border);
+      transition: all var(--transition);
+    }
+    .btn-cancel:hover { background: var(--border); }
+    [data-theme="dark"] .btn-cancel { background: var(--bg2); }
+    .btn-save {
+      padding: 0.72rem 1.8rem; border-radius: 100px;
+      background: var(--accent); color: #fff;
+      font-size: 0.92rem; font-weight: 700;
+      box-shadow: 0 4px 14px rgba(224,123,90,0.3);
+      transition: all var(--transition);
+    }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(224,123,90,0.4); }
+
+    /* ===== GALLERY ===== */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.2rem;
+    }
+    .gallery-card {
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 1;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 4px 18px var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .gallery-card:hover { transform: scale(1.04); box-shadow: 0 14px 40px var(--shadow2); }
+    .gallery-card-bg {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 4rem;
+      position: relative;
+    }
+    .gallery-card-bg::before {
+      content: ''; position: absolute; inset: 0;
+      opacity: 0.45;
+    }
+    .gc1 .gallery-card-bg { background: linear-gradient(135deg, #f5d5c0, #e8a87c); }
+    .gc2 .gallery-card-bg { background: linear-gradient(135deg, #f5c4d4, #d4849a); }
+    .gc3 .gallery-card-bg { background: linear-gradient(135deg, #c4e0d4, #8abba6); }
+    .gc4 .gallery-card-bg { background: linear-gradient(135deg, #d4c8e8, #a89cd4); }
+    .gc5 .gallery-card-bg { background: linear-gradient(135deg, #f5e6c4, #d4b87c); }
+    .gc6 .gallery-card-bg { background: linear-gradient(135deg, #c8e4d0, #7aaf90); }
+    .gallery-card-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; transition: opacity var(--transition);
+      color: #fff; text-align: center; padding: 1rem;
+    }
+    .gallery-card:hover .gallery-card-overlay { opacity: 1; }
+    .gallery-card-overlay h4 { font-size: 1.05rem; margin-bottom: 0.3rem; }
+    .gallery-card-overlay p { font-size: 0.82rem; opacity: 0.85; }
+    .gallery-emoji { font-size: 3.5rem; position: relative; z-index: 1; }
+
+    /* ===== PROGRESS TRACKER ===== */
+    #progress { background: var(--bg2); }
+    .progress-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2rem; align-items: start;
+    }
+    .stats-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 16px var(--shadow);
+      transition: transform var(--transition);
+    }
+    .stat-card:hover { transform: translateY(-3px); }
+    .stat-card .s-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem; font-weight: 700;
+      display: block; color: var(--accent);
+      line-height: 1;
+    }
+    .stat-card .s-lbl { font-size: 0.82rem; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.4rem; display: block; }
+    .progress-bars { display: flex; flex-direction: column; gap: 1.4rem; }
+    .pbar-item {}
+    .pbar-label { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; color: var(--text2); }
+    .pbar-track {
+      height: 10px; border-radius: 100px;
+      background: var(--cream);
+      overflow: hidden;
+    }
+    [data-theme="dark"] .pbar-track { background: var(--bg); }
+    .pbar-fill {
+      height: 100%; border-radius: 100px;
+      transition: width 1s cubic-bezier(.4,0,.2,1);
+    }
+    .pbar-accent  { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+    .pbar-sage    { background: linear-gradient(90deg, var(--accent4), var(--sage)); }
+    .pbar-lavender{ background: linear-gradient(90deg, var(--accent3), var(--lavender)); }
+
+    /* ===== TIPS SECTION ===== */
+    .tips-inner {
+      max-width: 700px; margin: 0 auto;
+      text-align: center;
+    }
+    .tip-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      box-shadow: 0 8px 32px var(--shadow);
+      position: relative; overflow: hidden;
+    }
+    .tip-card::before {
+      content: '💬'; position: absolute;
+      top: -20px; left: 20px;
+      font-size: 5rem; opacity: 0.06;
+    }
+    .tip-num {
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--accent3);
+      margin-bottom: 1rem; display: block;
+    }
+    .tip-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; color: var(--text);
+      line-height: 1.65; margin-bottom: 2rem;
+      font-style: italic;
+    }
+    .tip-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 1.5rem; }
+    .tip-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); transition: background var(--transition);
+    }
+    .tip-dot.active { background: var(--accent); }
+    .btn-tip {
+      background: var(--surface); border: 1.5px solid var(--border);
+      padding: 0.72rem 1.8rem; border-radius: 100px;
+      color: var(--accent); font-weight: 700; font-size: 0.92rem;
+      transition: all var(--transition);
+    }
+    .btn-tip:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ===== TESTIMONIALS ===== */
+    #testimonials { background: var(--bg2); }
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.8rem;
+      box-shadow: 0 4px 20px var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition);
+      position: relative;
+    }
+    .testimonial-card:hover { transform: translateY(-4px); box-shadow: 0 12px 35px var(--shadow2); }
+    .test-quote {
+      font-size: 2.2rem; line-height: 1;
+      color: var(--accent); margin-bottom: 1rem; opacity: 0.6;
+    }
+    .test-text {
+      font-size: 0.95rem; color: var(--text2); line-height: 1.7;
+      margin-bottom: 1.5rem; font-style: italic;
+    }
+    .test-author { display: flex; align-items: center; gap: 0.8rem; }
+    .test-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .ta1 { background: var(--cream); }
+    .ta2 { background: var(--pink); }
+    .ta3 { background: var(--sage); }
+    .ta4 { background: var(--lavender); }
+    .test-name { font-weight: 700; color: var(--text); font-size: 0.92rem; }
+    .test-role { font-size: 0.78rem; color: var(--text3); }
+    .test-stars { color: #f4a846; font-size: 0.88rem; margin-bottom: 0.2rem; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--text);
+      color: rgba(255,248,240,0.85);
+      padding: 4rem 2rem 2rem;
+    }
+    [data-theme="dark"] footer { background: #100c08; }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem; margin-bottom: 3rem;
+    }
+    .footer-brand .logo-txt {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700; color: var(--accent);
+      display: block; margin-bottom: 0.8rem;
+    }
+    .footer-brand p { font-size: 0.88rem; opacity: 0.72; line-height: 1.65; margin-bottom: 1.5rem; }
+    .social-links { display: flex; gap: 0.8rem; }
+    .social-link {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: rgba(255,248,240,0.7);
+      transition: all var(--transition);
+    }
+    .social-link:hover { background: var(--accent); color: #fff; transform: translateY(-2px); }
+    .footer-col h5 {
+      font-size: 0.82rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--accent2);
+      margin-bottom: 1.2rem;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+    .footer-col ul li a {
+      font-size: 0.88rem; opacity: 0.7;
+      transition: opacity var(--transition), color var(--transition);
+    }
+    .footer-col ul li a:hover { opacity: 1; color: var(--accent); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+      font-size: 0.82rem; opacity: 0.55;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 3000;
+      background: var(--text); color: var(--bg);
+      padding: 0.9rem 1.5rem; border-radius: var(--radius-sm);
+      font-size: 0.9rem; font-weight: 600;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+      transform: translateY(100px); opacity: 0;
+      transition: all var(--transition);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .progress-layout { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 680px) {
+      .navbar { padding: 0 1.2rem; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .hero-stats { gap: 1.5rem; }
+      .stats-cards { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      section { padding: 3.5rem 1.2rem; }
+      .modal { padding: 1.6rem; }
+    }
+    @media (max-width: 400px) {
+      .stats-cards { grid-template-columns: 1fr; }
+      .proj-actions { flex-direction: column; }
+      .proj-btn { width: 100%; text-align: center; }
+    }
+
+    /* ===== MISC ANIMATIONS ===== */
+    .fade-in { animation: fadeUp 0.6s ease both; }
+    .fade-in-d1 { animation-delay: 0.1s; }
+    .fade-in-d2 { animation-delay: 0.2s; }
+    .fade-in-d3 { animation-delay: 0.3s; }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======= NAVBAR ======= -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <span>🧶</span> Crochet App
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#progress">Progress</a></li>
+    <li><a href="#tips">Tips</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode" aria-label="Toggle theme"></button>
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero"          onclick="closeMobile()">🏠 Home</a>
+  <a href="#projects"      onclick="closeMobile()">🧶 Projects</a>
+  <a href="#gallery"       onclick="closeMobile()">🖼️ Gallery</a>
+  <a href="#progress"      onclick="closeMobile()">📊 Progress</a>
+  <a href="#tips"          onclick="closeMobile()">💡 Tips</a>
+  <a href="#testimonials"  onclick="closeMobile()">💬 Reviews</a>
+</div>
+
+<!-- ======= HERO ======= -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+  <div class="blob blob4"></div>
+  <div class="yarn-deco">🧶</div>
+  <div class="yarn-deco">🪡</div>
+  <div class="yarn-deco">✂️</div>
+  <div class="hero-content">
+    <div class="hero-badge">🌸 Your Creative Corner</div>
+    <h1>Craft Your <em>Crochet</em> Story, One Stitch at a Time</h1>
+    <p>Track your crochet projects, celebrate completions, discover tips, and stay inspired on your handmade journey. All in one cozy place.</p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn btn-primary">✨ My Projects</a>
+      <a href="#gallery"  class="btn btn-outline">🖼️ Browse Gallery</a>
+    </div>
+    <div class="hero-stats" id="heroStats">
+      <div class="hero-stat"><span class="num" id="hsTotalProj">0</span><span class="lbl">Projects</span></div>
+      <div class="hero-stat"><span class="num" id="hsDoneProj">0</span><span class="lbl">Completed</span></div>
+      <div class="hero-stat"><span class="num" id="hsPendProj">0</span><span class="lbl">In Progress</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= PROJECTS ======= -->
+<section id="projects">
+  <div class="section-inner">
+    <div class="section-title">
+      <div class="pill">🧶 CRUD Manager</div>
+      <h2>My Crochet Projects</h2>
+      <p>Add, edit, complete, and manage all your crochet projects in one place.</p>
+    </div>
+    <div class="project-controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search projects..." oninput="renderProjects()" />
+      </div>
+      <select class="filter-select" id="filterDiff" onchange="renderProjects()">
+        <option value="all">All Difficulties</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+      <button class="btn-add" onclick="openModal()">+ Add Project</button>
+    </div>
+    <div class="projects-grid" id="projectsGrid">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ======= GALLERY ======= -->
+<section id="gallery">
+  <div class="section-inner">
+    <div class="section-title">
+      <div class="pill">🖼️ Inspiration</div>
+      <h2>Crochet Gallery</h2>
+      <p>A showcase of beautiful crochet creations to spark your creativity.</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-card gc1">
+        <div class="gallery-card-bg"><span class="gallery-emoji">🧸</span></div>
+        <div class="gallery-card-overlay"><h4>Amigurumi Bear</h4><p>Beginner friendly plushie</p></div>
+      </div>
+      <div class="gallery-card gc2">
+        <div class="gallery-card-bg"><span class="gallery-emoji">🌸</span></div>
+        <div class="gallery-card-overlay"><h4>Flower Granny Square</h4><p>Classic colorful motif</p></div>
+      </div>
+      <div class="gallery-card gc3">
+        <div class="gallery-card-bg"><span class="gallery-emoji">🧣</span></div>
+        <div class="gallery-card-overlay"><h4>Cozy Infinity Scarf</h4><p>Perfect for autumn days</p></div>
+      </div>
+      <div class="gallery-card gc4">
+        <div class="gallery-card-bg"><span class="gallery-emoji">👜</span></div>
+        <div class="gallery-card-overlay"><h4>Boho Market Bag</h4><p>Sustainable & stylish</p></div>
+      </div>
+      <div class="gallery-card gc5">
+        <div class="gallery-card-bg"><span class="gallery-emoji">🪆</span></div>
+        <div class="gallery-card-overlay"><h4>Doll Collection</h4><p>Intricate character design</p></div>
+      </div>
+      <div class="gallery-card gc6">
+        <div class="gallery-card-bg"><span class="gallery-emoji">🌈</span></div>
+        <div class="gallery-card-overlay"><h4>Rainbow Blanket</h4><p>Joyful color-blocked throw</p></div>
+      </div>
+      <div class="gallery-card gc1" style="--gc-offset:1">
+        <div class="gallery-card-bg"><span class="gallery-emoji">🎀</span></div>
+        <div class="gallery-card-overlay"><h4>Hair Accessories</h4><p>Mini bows & scrunchies</p></div>
+      </div>
+      <div class="gallery-card gc2">
+        <div class="gallery-card-bg"><span class="gallery-emoji">🌿</span></div>
+        <div class="gallery-card-overlay"><h4>Plant Hanger</h4><p>Macramé-inspired beauty</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= PROGRESS ======= -->
+<section id="progress">
+  <div class="section-inner">
+    <div class="section-title">
+      <div class="pill">📊 Tracker</div>
+      <h2>Your Progress</h2>
+      <p>Celebrate how far you've come in your crochet journey.</p>
+    </div>
+    <div class="progress-layout">
+      <div class="stats-cards" id="statsCards">
+        <div class="stat-card">
+          <span class="s-num" id="stTotal">0</span>
+          <span class="s-lbl">Total Projects</span>
+        </div>
+        <div class="stat-card">
+          <span class="s-num" id="stDone">0</span>
+          <span class="s-lbl">Completed</span>
+        </div>
+        <div class="stat-card">
+          <span class="s-num" id="stPend">0</span>
+          <span class="s-lbl">In Progress</span>
+        </div>
+        <div class="stat-card">
+          <span class="s-num" id="stPct">0%</span>
+          <span class="s-lbl">Success Rate</span>
+        </div>
+      </div>
+      <div class="progress-bars" id="progressBars">
+        <div class="pbar-item">
+          <div class="pbar-label">
+            <span>🟢 Completed</span>
+            <span id="pbDonePct">0%</span>
+          </div>
+          <div class="pbar-track"><div class="pbar-fill pbar-accent" id="pbDoneFill" style="width:0%"></div></div>
+        </div>
+        <div class="pbar-item">
+          <div class="pbar-label">
+            <span>🌿 Easy Projects</span>
+            <span id="pbEasyPct">0%</span>
+          </div>
+          <div class="pbar-track"><div class="pbar-fill pbar-sage" id="pbEasyFill" style="width:0%"></div></div>
+        </div>
+        <div class="pbar-item">
+          <div class="pbar-label">
+            <span>💛 Medium Projects</span>
+            <span id="pbMedPct">0%</span>
+          </div>
+          <div class="pbar-track"><div class="pbar-fill pbar-lavender" id="pbMedFill" style="width:0%"></div></div>
+        </div>
+        <div class="pbar-item">
+          <div class="pbar-label">
+            <span>🌸 Hard Projects</span>
+            <span id="pbHardPct">0%</span>
+          </div>
+          <div class="pbar-track"><div class="pbar-fill pbar-accent" id="pbHardFill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= TIPS ======= -->
+<section id="tips">
+  <div class="section-inner">
+    <div class="section-title">
+      <div class="pill">💡 Daily Tips</div>
+      <h2>Crochet Wisdom</h2>
+      <p>Little tips that make a big difference in your craft.</p>
+    </div>
+    <div class="tips-inner">
+      <div class="tip-card">
+        <span class="tip-num" id="tipNum">Tip 1 of 12</span>
+        <p class="tip-text" id="tipText">Loading tip…</p>
+        <div class="tip-dots" id="tipDots"></div>
+        <button class="btn-tip" onclick="nextTip()">🎲 Next Tip →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= TESTIMONIALS ======= -->
+<section id="testimonials">
+  <div class="section-inner">
+    <div class="section-title">
+      <div class="pill">💬 Reviews</div>
+      <h2>From the Community</h2>
+      <p>What fellow crocheters are saying about their experience.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card fade-in">
+        <div class="test-quote">"</div>
+        <div class="test-stars">★★★★★</div>
+        <p class="test-text">This app completely transformed how I track my projects. I used to lose count of what I was working on — now everything is organized beautifully!</p>
+        <div class="test-author">
+          <div class="test-avatar ta1">🌸</div>
+          <div><div class="test-name">Amelia Rose</div><div class="test-role">Crochet Artist · 3 years</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in fade-in-d1">
+        <div class="test-quote">"</div>
+        <div class="test-stars">★★★★★</div>
+        <p class="test-text">The daily tips section taught me the magic of the magic ring! I've leveled up so much since I started using this app regularly.</p>
+        <div class="test-author">
+          <div class="test-avatar ta2">🧸</div>
+          <div><div class="test-name">Sakura Tanaka</div><div class="test-role">Amigurumi Enthusiast · 1 year</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in fade-in-d2">
+        <div class="test-quote">"</div>
+        <div class="test-stars">★★★★☆</div>
+        <p class="test-text">Love the cozy aesthetic! It actually makes me want to pick up my hook and start creating. The progress tracker keeps me motivated every single day.</p>
+        <div class="test-author">
+          <div class="test-avatar ta3">🌿</div>
+          <div><div class="test-name">Clara Müller</div><div class="test-role">Slow Stitcher · 5 years</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in fade-in-d3">
+        <div class="test-quote">"</div>
+        <div class="test-stars">★★★★★</div>
+        <p class="test-text">I never realized how many projects I had abandoned until I started tracking them! Now I finish what I start. This app is a game-changer for any crafter.</p>
+        <div class="test-author">
+          <div class="test-avatar ta4">🦋</div>
+          <div><div class="test-name">Brigitte Lefèvre</div><div class="test-role">Blanket Maker · 7 years</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= FOOTER ======= -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo-txt">🧶 Crochet App</span>
+        <p>Your cozy companion for all things crochet. Track projects, discover tips, and celebrate every stitch of your handmade journey.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" title="Instagram">📸</a>
+          <a href="#" class="social-link" title="Pinterest">📌</a>
+          <a href="#" class="social-link" title="YouTube">▶️</a>
+          <a href="#" class="social-link" title="Twitter/X">🐦</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Features</h5>
+        <ul>
+          <li><a href="#projects">My Projects</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#progress">Progress</a></li>
+          <li><a href="#tips">Daily Tips</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#">Beginner Guide</a></li>
+          <li><a href="#">Stitch Library</a></li>
+          <li><a href="#">Pattern Ideas</a></li>
+          <li><a href="#">Yarn Guide</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Forums</a></li>
+          <li><a href="#">Challenges</a></li>
+          <li><a href="#">Newsletter</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 Crochet App. Made with 🧶 and lots of love.</span>
+      <span>Privacy · Terms · Cookies</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ======= ADD/EDIT MODAL ======= -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal glass2">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add New Project</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Project Name *</label>
+      <input type="text" id="projName" placeholder="e.g. Rainbow Granny Blanket" maxlength="60" />
+    </div>
+    <div class="form-group">
+      <label>Difficulty Level *</label>
+      <select id="projDiff">
+        <option value="easy">🟢 Easy</option>
+        <option value="medium">💛 Medium</option>
+        <option value="hard">🌸 Hard</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Yarn Type</label>
+      <input type="text" id="projYarn" placeholder="e.g. Merino wool, cotton, acrylic…" maxlength="50" />
+    </div>
+    <div class="form-group">
+      <label>Time Required</label>
+      <input type="text" id="projTime" placeholder="e.g. 3–5 hours, 2 weeks…" maxlength="40" />
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea id="projNotes" placeholder="Hook size, gauge, special stitches…" rows="3"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProject()">💾 Save Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= TOAST ======= -->
+<div class="toast" id="toast"></div>
+
+<!-- ======= JAVASCRIPT ======= -->
+<script>
+  /* ============================
+     DATA & LOCALSTORAGE
+  ============================ */
+  const STORE_KEY = 'crochet_projects_v1';
+  const THEME_KEY = 'crochet_theme_v1';
+  let editingId = null;
+
+  function getProjects() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+    catch { return []; }
+  }
+  function saveProjects(arr) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  }
+
+  /* ============================
+     THEME TOGGLE
+  ============================ */
+  function initTheme() {
+    const saved = localStorage.getItem(THEME_KEY) || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+  }
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+  });
+
+  /* ============================
+     HAMBURGER MENU
+  ============================ */
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  });
+  function closeMobile() {
+    document.getElementById('mobileMenu').classList.remove('open');
+  }
+
+  /* ============================
+     MODAL
+  ============================ */
+  function openModal(id = null) {
+    editingId = id;
+    const title = document.getElementById('modalTitle');
+    if (id !== null) {
+      const projects = getProjects();
+      const p = projects.find(x => x.id === id);
+      if (!p) return;
+      title.textContent = '✏️ Edit Project';
+      document.getElementById('projName').value  = p.name;
+      document.getElementById('projDiff').value  = p.difficulty;
+      document.getElementById('projYarn').value  = p.yarn;
+      document.getElementById('projTime').value  = p.time;
+      document.getElementById('projNotes').value = p.notes || '';
+    } else {
+      title.textContent = '✨ Add New Project';
+      document.getElementById('projName').value  = '';
+      document.getElementById('projDiff').value  = 'easy';
+      document.getElementById('projYarn').value  = '';
+      document.getElementById('projTime').value  = '';
+      document.getElementById('projNotes').value = '';
+    }
+    document.getElementById('modalOverlay').classList.add('open');
+    document.getElementById('projName').focus();
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    editingId = null;
+  }
+  // Close on overlay click
+  document.getElementById('modalOverlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  });
+
+  /* ============================
+     CRUD OPERATIONS
+  ============================ */
+  function saveProject() {
+    const name  = document.getElementById('projName').value.trim();
+    const diff  = document.getElementById('projDiff').value;
+    const yarn  = document.getElementById('projYarn').value.trim();
+    const time  = document.getElementById('projTime').value.trim();
+    const notes = document.getElementById('projNotes').value.trim();
+
+    if (!name) { showToast('⚠️ Please enter a project name!'); return; }
+
+    let projects = getProjects();
+
+    if (editingId !== null) {
+      // EDIT
+      projects = projects.map(p => p.id === editingId
+        ? { ...p, name, difficulty: diff, yarn, time, notes }
+        : p
+      );
+      showToast('✅ Project updated!');
+    } else {
+      // ADD
+      const newProj = {
+        id: Date.now(),
+        name, difficulty: diff, yarn, time, notes,
+        done: false,
+        createdAt: new Date().toISOString()
+      };
+      projects.unshift(newProj);
+      showToast('🎉 Project added!');
+    }
+
+    saveProjects(projects);
+    closeModal();
+    renderProjects();
+    updateStats();
+  }
+
+  function deleteProject(id) {
+    if (!confirm('Delete this project? This cannot be undone.')) return;
+    let projects = getProjects().filter(p => p.id !== id);
+    saveProjects(projects);
+    renderProjects();
+    updateStats();
+    showToast('🗑️ Project deleted.');
+  }
+
+  function toggleDone(id) {
+    let projects = getProjects().map(p =>
+      p.id === id ? { ...p, done: !p.done } : p
+    );
+    saveProjects(projects);
+    renderProjects();
+    updateStats();
+    const p = projects.find(x => x.id === id);
+    showToast(p.done ? '🎊 Marked as completed!' : '🔄 Moved back to in-progress.');
+  }
+
+  /* ============================
+     RENDER PROJECTS
+  ============================ */
+  const diffLabels = { easy: '🟢 Easy', medium: '💛 Medium', hard: '🌸 Hard' };
+  const diffBadge  = { easy: 'badge-easy', medium: 'badge-medium', hard: 'badge-hard' };
+
+  function renderProjects() {
+    const grid    = document.getElementById('projectsGrid');
+    const query   = document.getElementById('searchInput').value.toLowerCase();
+    const diffFlt = document.getElementById('filterDiff').value;
+
+    let projects = getProjects().filter(p => {
+      const matchName = p.name.toLowerCase().includes(query);
+      const matchDiff = diffFlt === 'all' || p.difficulty === diffFlt;
+      return matchName && matchDiff;
+    });
+
+    if (projects.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🧶</div>
+          <p>No projects found. Start creating!</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = projects.map(p => `
+      <div class="project-card ${p.difficulty} ${p.done ? 'done' : ''}">
+        <div class="proj-header">
+          <span class="proj-name">${escHtml(p.name)}</span>
+          <span class="proj-badge ${diffBadge[p.difficulty]}">${diffLabels[p.difficulty]}</span>
+        </div>
+        <div class="proj-meta">
+          ${p.yarn ? `<div class="proj-meta-item"><span>🪡</span><span>${escHtml(p.yarn)}</span></div>` : ''}
+          ${p.time ? `<div class="proj-meta-item"><span>⏱️</span><span>${escHtml(p.time)}</span></div>` : ''}
+          <div class="proj-meta-item"><span>${p.done ? '✅' : '🕐'}</span><span>${p.done ? 'Completed' : 'In Progress'}</span></div>
+        </div>
+        ${p.notes ? `<div class="proj-meta-item" style="font-size:0.82rem;color:var(--text3);margin-bottom:0.8rem;font-style:italic;">📝 ${escHtml(p.notes)}</div>` : ''}
+        <div class="proj-actions">
+          <button class="proj-btn btn-done" onclick="toggleDone(${p.id})">${p.done ? '↩️ Undo' : '✔ Complete'}</button>
+          <button class="proj-btn btn-edit" onclick="openModal(${p.id})">✏️ Edit</button>
+          <button class="proj-btn btn-del"  onclick="deleteProject(${p.id})">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ============================
+     STATS & PROGRESS BARS
+  ============================ */
+  function updateStats() {
+    const all = getProjects();
+    const total = all.length;
+    const done  = all.filter(p => p.done).length;
+    const pend  = total - done;
+    const easy  = all.filter(p => p.difficulty === 'easy').length;
+    const med   = all.filter(p => p.difficulty === 'medium').length;
+    const hard  = all.filter(p => p.difficulty === 'hard').length;
+    const pct   = total ? Math.round((done / total) * 100) : 0;
+
+    // Hero
+    document.getElementById('hsTotalProj').textContent = total;
+    document.getElementById('hsDoneProj').textContent  = done;
+    document.getElementById('hsPendProj').textContent  = pend;
+
+    // Stat cards
+    document.getElementById('stTotal').textContent = total;
+    document.getElementById('stDone').textContent  = done;
+    document.getElementById('stPend').textContent  = pend;
+    document.getElementById('stPct').textContent   = pct + '%';
+
+    // Progress bars
+    const dp = total ? Math.round((done / total) * 100) : 0;
+    const ep = total ? Math.round((easy / total) * 100) : 0;
+    const mp = total ? Math.round((med  / total) * 100) : 0;
+    const hp = total ? Math.round((hard / total) * 100) : 0;
+
+    setBar('pbDone', dp);
+    setBar('pbEasy', ep);
+    setBar('pbMed',  mp);
+    setBar('pbHard', hp);
+  }
+
+  function setBar(id, pct) {
+    document.getElementById(id + 'Pct').textContent = pct + '%';
+    document.getElementById(id + 'Fill').style.width = pct + '%';
+  }
+
+  /* ============================
+     TIPS
+  ============================ */
+  const TIPS = [
+    "Always start with a slip knot — it's the foundation of every crochet project.",
+    "Use stitch markers to keep track of the beginning of each round when working in the round.",
+    "Block your finished pieces for a polished, professional look — especially lace work.",
+    "Count your stitches at the end of every row; catching mistakes early saves tons of time!",
+    "The magic ring (or magic circle) is perfect for starting amigurumi with no visible hole.",
+    "Use a slightly larger hook than recommended for a looser, drapier fabric.",
+    "Weave in ends as you go instead of saving them all for the end — future you will be grateful!",
+    "Learn to read a crochet chart; it can be faster to follow than written instructions.",
+    "Practice consistent tension — try relaxing your grip on the yarn for even stitches.",
+    "Cotton yarn is great for dishcloths and summer projects; wool excels in warmth and stitch definition.",
+    "Keep a project bag for each work-in-progress so everything stays organized and tangle-free.",
+    "Take photos of your progress — they make the best before-and-after memories of your craft journey!"
+  ];
+
+  let currentTip = 0;
+
+  function renderTipDots() {
+    const dotsEl = document.getElementById('tipDots');
+    dotsEl.innerHTML = TIPS.map((_, i) =>
+      `<div class="tip-dot ${i === currentTip ? 'active' : ''}" onclick="goTip(${i})"></div>`
+    ).join('');
+  }
+
+  function showTip(idx) {
+    currentTip = (idx + TIPS.length) % TIPS.length;
+    document.getElementById('tipText').textContent = TIPS[currentTip];
+    document.getElementById('tipNum').textContent = `Tip ${currentTip + 1} of ${TIPS.length}`;
+    renderTipDots();
+  }
+
+  function nextTip() { showTip(currentTip + 1); }
+  function goTip(i)  { showTip(i); }
+
+  /* ============================
+     TOAST
+  ============================ */
+  let toastTimer;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  /* ============================
+     KEYBOARD SHORTCUTS
+  ============================ */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if ((e.key === 'Enter') && document.getElementById('modalOverlay').classList.contains('open')) {
+      if (document.activeElement.tagName !== 'TEXTAREA') saveProject();
+    }
+  });
+
+  /* ============================
+     INIT
+  ============================ */
+  initTheme();
+  renderProjects();
+  updateStats();
+  showTip(Math.floor(Math.random() * TIPS.length));
+</script>
+</body>
+</html>
